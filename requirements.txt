@@ -1,4 +1,7 @@
 ago==0.0.93
+aiohttp==3.8.1
+bs4==0.0.1
 Flask==2.0.2
+gunicorn==20.1.0
 python-whois==0.7.3
 requests==2.27.1
