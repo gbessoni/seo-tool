@@ -1,0 +1,4 @@
+ago==0.0.93
+Flask==2.0.2
+python-whois==0.7.3
+requests==2.27.1

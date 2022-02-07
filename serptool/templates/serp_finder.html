@@ -1,0 +1,147 @@
+{% extends '_base.html' %}
+
+
+{% block title %}SERP Finder{% endblock title %}
+
+
+{% block content %}
+
+<h1>SERP Finder</h1>
+
+<form>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search keyword" name="query">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+
+{% if report %}
+<hr>
+
+<h4>Filters</h4>
+<form>
+    <div class="input-group mb-3">
+        <span class="input-group-text">From position</span>
+        <input id="from-pos" type="number" min="1" class="form-control"
+               onchange="applyFilters()">
+        <span class="input-group-text">To position</span>
+        <input id="to-pos" type="number" max="100" class="form-control"
+               onchange="applyFilters()">
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text">From age</span>
+        <input id="from-age" type="number" min="1" class="form-control"
+               onchange="applyFilters()">
+        <span class="input-group-text">To age</span>
+        <input id="to-age" type="number" max="100" class="form-control"
+               onchange="applyFilters()">
+    </div>
+</form>
+
+<hr>
+
+<table class="table table-hover table-results">
+<thead>
+<tr>
+    <th>Position</th>
+    <th>Link</th>
+    <th>Title</th>
+    <th>Domain</th>
+    <th>Age</th>
+</tr>
+</thead>
+
+<tbody>
+{% for entry in report %}
+<tr data-domain="{{ entry['domain'] }}"
+    data-position="{{ entry['serp']['position'] }}">
+    <td>{{ entry['serp']['position'] }}</td>
+    <td>{{ entry['serp']['link'] }}</td>
+    <td>{{ entry['serp']['title'] }}</td>
+    <td>{{ entry['domain'] }}</td>
+    <td data-bs-toggle="tooltip" data-bs-placement="right" title="">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+{% endblock content %}
+
+
+{% block scripts %}
+
+<script>
+function applyFilters() {
+    var rows = $('.table-results tbody tr');
+
+    // First show all rows
+    rows.each(function() {
+        $(this).show();
+    });
+
+    var from_pos = parseInt($('#from-pos').val());
+    var to_pos = parseInt($('#to-pos').val());
+
+    var from_age = parseInt($('#from-age').val());
+    var to_age = parseInt($('#to-age').val());
+
+    rows.each(function() {
+        var row = $(this);
+        var position = row.data('position');
+        var age = row.data('yearAge');
+
+        if (position < from_pos || position > to_pos)
+            row.hide();
+
+        if (from_age || to_age)
+            if (age < 0 || (age < from_age || age > to_age))
+                row.hide();
+    });
+
+};
+
+$(window).on('load', function() {
+    var rows = $('.table-results tbody tr');
+    if (!rows.length) return;
+
+    console.log('Fetching data...');
+
+    var all_domains = rows.map(function() {
+        return $(this).data('domain');
+    }).get();
+
+    // Filter unique so we don't double-query if there are multiple results on the
+    // same domain
+    var domains = all_domains.filter(function(itm, i, a) {
+        return i == a.indexOf(itm);
+    });
+
+    domains.forEach(function(domain) {
+        var target_cell = $('tr[data-domain="' + domain + '"] td:eq(4)')
+
+        var url = '/check-domain?domain=' + domain;
+        $.ajax({
+            url: url,
+            dataType: 'json'
+        }).done(function(data) {
+            if ('humanized' in data) {
+                target_cell.text(data.humanized);
+                target_cell.parents('tr').data('yearAge', data.year_age);
+            } else {
+                target_cell.text('N/A');
+                target_cell.parents('tr').data('yearAge', -1);
+            }
+        }).fail(function(data) {
+            target_cell.text('Failure');
+        });
+    });
+});
+</script>
+
+{% endblock scripts %}
