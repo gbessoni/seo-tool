@@ -129,7 +129,7 @@ $(window).on('load', function() {
     });
 
     domains.forEach(function(domain) {
-        var target_cell = $('tr[data-domain="' + domain + '"] td:eq(4)')
+        var targets = $('tr[data-domain="' + domain + '"]');
 
         var url = '/check-domain?domain=' + domain;
         $.ajax({
@@ -137,14 +137,23 @@ $(window).on('load', function() {
             dataType: 'json'
         }).done(function(data) {
             if ('humanized' in data) {
-                target_cell.text(data.humanized);
-                target_cell.parents('tr').data('yearAge', data.year_age);
+                var text = data.humanized;
+                var age = data.year_age;
             } else {
-                target_cell.text('N/A');
-                target_cell.parents('tr').data('yearAge', -1);
+                var text = 'N/A';
+                var age = -1;
             }
+            targets.each(function() {
+                var cell = $(this).find('td:eq(4)');
+                cell.text(text);
+                cell.parents('tr').data('yearAge', age);
+            });
         }).fail(function(data) {
-            target_cell.text('Failure');
+            targets.each(function() {
+                var cell = $(this).find('td:eq(4)');
+                cell.text('Failure');
+                cell.parents('tr').data('yearAge', -1);
+            });
         });
     });
 });

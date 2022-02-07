@@ -113,7 +113,7 @@ $(window).on('load', function() {
     });
 
     domains.forEach(function(domain) {
-        var target_cell = $('tr[data-domain="' + domain + '"] td:eq(4)')
+        var targets = $('tr[data-domain="' + domain + '"]');
 
         var url = '/sitemap-analysis?domain=' + domain;
         $.ajax({
@@ -128,9 +128,15 @@ $(window).on('load', function() {
                 var row_text = 'X';
             }
 
-            target_cell.text(row_text);
+            targets.each(function() {
+                var cell = $(this).find('td:eq(4)');
+                cell.text(row_text);
+            });
         }).fail(function(data) {
-            target_cell.text('Failure');
+            targets.each(function() {
+                var cell = $(this).find('td:eq(4)');
+                cell.text('Failure');
+            });
         });
     });
 });
