@@ -3,7 +3,7 @@ from urllib.parse import urlencode, urlparse
 
 import aiohttp
 
-from . import config
+import config
 
 
 def _extract_results(data):

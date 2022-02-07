@@ -7,11 +7,7 @@ from flask import (
     render_template,
 )
 
-from . import (
-    serpapi,
-    domains,
-    sitemaps,
-)
+import serpapi, domains, sitemaps
 
 
 import asyncio
