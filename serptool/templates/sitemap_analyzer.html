@@ -29,6 +29,7 @@
                onchange="applyFilters()">
     </div>
 </form>
+<p>Showing <span id="filter-count">{{ report.__len__() }}</span> results.</p>
 
 <hr>
 
@@ -79,14 +80,20 @@ function applyFilters() {
     var from_pos = parseInt($('#from-pos').val());
     var to_pos = parseInt($('#to-pos').val());
 
+    var filtered_results = rows.length;
+
     rows.each(function() {
         var row = $(this);
         var position = row.data('position');
 
         if (position < from_pos || position > to_pos)
+        {
             row.hide();
+            filtered_results -= 1;
+        }
     });
 
+    $('#filter-count').text(filtered_results);
 };
 
 $(window).on('load', function() {

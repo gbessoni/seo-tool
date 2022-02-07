@@ -38,6 +38,7 @@
                onchange="applyFilters()">
     </div>
 </form>
+<p>Showing <span id="filter-count">{{ report.__len__() }}</span> results.</p>
 
 <hr>
 
@@ -91,19 +92,24 @@ function applyFilters() {
     var from_age = parseInt($('#from-age').val());
     var to_age = parseInt($('#to-age').val());
 
+    var filtered_results = rows.length;
+
     rows.each(function() {
         var row = $(this);
         var position = row.data('position');
         var age = row.data('yearAge');
 
-        if (position < from_pos || position > to_pos)
+        if (position < from_pos || position > to_pos) {
             row.hide();
-
-        if (from_age || to_age)
-            if (age < 0 || (age < from_age || age > to_age))
+            filtered_results -= 1;
+        } else if (from_age || to_age)
+            if (age < 0 || (age < from_age || age > to_age)) {
                 row.hide();
+                filtered_results -= 1;
+            }
     });
 
+    $('#filter-count').text(filtered_results);
 };
 
 $(window).on('load', function() {
