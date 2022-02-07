@@ -1,0 +1,4 @@
+import os
+
+
+SERP_API_KEY = os.environ['SERP_API_KEY']
