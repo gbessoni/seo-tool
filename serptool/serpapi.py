@@ -3,9 +3,7 @@ from urllib.parse import urlencode, urlparse
 
 import aiohttp
 
-
-# TODO: Move out of here
-api_key = '7d49c4bb23310bf6942c0ec8f47cd2ec56ceab7989f071f06891a5ebf818b478'
+from . import config
 
 
 def _extract_results(data):
@@ -43,7 +41,7 @@ async def perform_search(query, target_amount, start_page=None):
     template_url = 'https://serpapi.com/search.json?{}'.format(
         urlencode({
             'q': query,
-            'api_key': api_key,
+            'api_key': config.SERP_API_KEY,
         }),
     )
 

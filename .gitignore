@@ -8,3 +8,6 @@ venv/
 
 # IDE
 .idea/
+
+# Project files
+config.py
