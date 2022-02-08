@@ -8,7 +8,7 @@
 
 <h1>Sitemap Analyzer</h1>
 
-<form>
+<form id="search-form">
     <p style="text-align: right; {% if not searches_remaining %}color:red{% endif %}">
         {{ searches_remaining }} searches remaining
     </p>
@@ -116,6 +116,10 @@ function applyFilters() {
 
     $('#filter-count').text(filtered_results);
 };
+
+$('#search-form').on('submit', function() {
+    $(this).find('button').attr('disabled', '');
+});
 
 $(window).on('load', function() {
     var rows = $('.table-results tbody tr');
