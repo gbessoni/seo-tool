@@ -122,7 +122,7 @@ function applyFilters() {
             row.hide();
             filtered_results -= 1;
         } else if (from_age || to_age)
-            if (age < 0 || (age < from_age || age > to_age)) {
+            if (age < 0 || (age < from_age || age >= to_age)) {
                 row.hide();
                 filtered_results -= 1;
             }
@@ -171,12 +171,14 @@ $(window).on('load', function() {
                 cell.text(text);
                 cell.parents('tr').data('yearAge', age);
             });
+            applyFilters();
         }).fail(function(data) {
             targets.each(function() {
                 var cell = $(this).find('td:eq(4)');
                 cell.text('Failure');
                 cell.parents('tr').data('yearAge', -1);
             });
+            applyFilters();
         });
     });
 });
