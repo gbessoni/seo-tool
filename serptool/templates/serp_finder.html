@@ -17,7 +17,8 @@
                {% if not searches_remaining %}
                     disabled
                 {% endif %}
-               placeholder="Search keyword" name="query">
+               placeholder="Search keyword" name="query"
+               value="{{ request.args.get('query') or '' }}">
         <button class="btn btn-outline-secondary"
                 {% if not searches_remaining %}
                     disabled
@@ -144,8 +145,8 @@ $(window).on('load', function() {
         return $(this).data('domain');
     }).get();
 
-    // Filter unique so we don't double-query if there are multiple results on the
-    // same domain
+    // Filter unique so we don't double-query if there are multiple results on
+    // the same domain
     var domains = all_domains.filter(function(itm, i, a) {
         return i == a.indexOf(itm);
     });

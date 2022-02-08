@@ -17,7 +17,8 @@
                {% if not searches_remaining %}
                     disabled
                 {% endif %}
-               placeholder="Search keyword" name="query">
+               placeholder="Search keyword" name="query"
+               value="{{ request.args.get('query') or '' }}">
         <button class="btn btn-outline-secondary"
                 {% if not searches_remaining %}
                     disabled
