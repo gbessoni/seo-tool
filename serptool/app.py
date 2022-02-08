@@ -28,14 +28,28 @@ def home():
 
 @app.route("/serp-finder")
 def serp_finder():
+    serp_info = serpapi.get_account_info()
     query = request.args.get('query')
 
-    if not query:
+    search_calls_remaining = serpapi.get_currently_remaining_searches(serp_info)
+    # 11 - 10 mandatory + 1 backup
+    searches_remaining = search_calls_remaining // 11
+
+    if not query or not searches_remaining:
         return render_template(
             'serp_finder.html',
+            searches_remaining=searches_remaining,
         )
 
-    serp_results = serpapi.search(query, 100)
+    try:
+        serp_results = serpapi.search(query, 100)
+    except serpapi.APILimitsReached as e:
+        return render_template(
+            'serp_finder.html',
+            searches_remaining=searches_remaining,
+            error=str(e),
+        )
+
     domain_results = serpapi.extract_domains_from_results(serp_results)
 
     report = []
@@ -48,6 +62,7 @@ def serp_finder():
     return render_template(
         'serp_finder.html',
         report=report,
+        searches_remaining=searches_remaining,
     )
 
 
@@ -81,14 +96,28 @@ def check_domain():
 
 @app.route("/sitemap-analyzer")
 def sitemap_analyzer():
+    serp_info = serpapi.get_account_info()
     query = request.args.get('query')
 
-    if not query:
+    search_calls_remaining = serpapi.get_currently_remaining_searches(serp_info)
+    # 4 - 3 mandatory + 1 backup
+    searches_remaining = search_calls_remaining // 4
+
+    if not query or not searches_remaining:
         return render_template(
             'sitemap_analyzer.html',
+            searches_remaining=searches_remaining,
         )
 
-    serp_results = serpapi.search(query, 30)
+    try:
+        serp_results = serpapi.search(query, 30)
+    except serpapi.APILimitsReached as e:
+        return render_template(
+            'sitemap_analyzer.html',
+            searches_remaining=searches_remaining,
+            error=str(e),
+        )
+
     domain_results = serpapi.extract_domains_from_results(serp_results)
 
     report = []
@@ -101,6 +130,7 @@ def sitemap_analyzer():
     return render_template(
         'sitemap_analyzer.html',
         report=report,
+        searches_remaining=searches_remaining,
     )
 
 

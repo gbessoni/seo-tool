@@ -1,3 +1,4 @@
+import requests
 import asyncio
 from urllib.parse import urlencode, urlparse
 
@@ -6,7 +7,33 @@ import aiohttp
 import config
 
 
+class APILimitsReached(Exception):
+    pass
+
+
+def get_account_info():
+    url = 'https://serpapi.com/account?api_key={}'.format(config.SERP_API_KEY)
+    response = requests.get(url)
+    return response.json()
+
+
+def get_currently_remaining_searches(account_info):
+    hour_searches_left = (
+        account_info['account_rate_limit_per_hour'] -
+        account_info['this_hour_searches']
+
+    )
+    return min([
+        account_info['plan_searches_left'],
+        account_info['total_searches_left'],
+        hour_searches_left,
+    ])
+
+
 def _extract_results(data):
+    if 'error' in data:
+        raise APILimitsReached(data['error'])
+
     results = data['organic_results']
     # Let's sort to be on the safe side
     results = sorted(results, key=lambda x: x['position'])
@@ -62,10 +89,10 @@ async def perform_search(query, target_amount, start_page=None):
     ]
 
     async with aiohttp.ClientSession() as session:
-        all_pages = await _fetch_all(session, urls)
+        responses = await _fetch_all(session, urls)
 
     results = []
-    for page in all_pages:
+    for page in responses:
         page_results = _extract_results(page)
         results.extend(page_results)
 
@@ -92,8 +119,7 @@ async def perform_search(query, target_amount, start_page=None):
 
 
 def search(query, target_amount):
-    results = asyncio.run(perform_search(query, target_amount))
-    return results
+    return asyncio.run(perform_search(query, target_amount))
 
 
 def extract_domains_from_results(results):

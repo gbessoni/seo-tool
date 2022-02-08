@@ -9,11 +9,32 @@
 <h1>Sitemap Analyzer</h1>
 
 <form>
+    <p style="text-align: right; {% if not searches_remaining %}color:red{% endif %}">
+        {{ searches_remaining }} searches remaining
+    </p>
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search keyword" name="query">
-        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        <input type="text" class="form-control"
+               {% if not searches_remaining %}
+                    disabled
+                {% endif %}
+               placeholder="Search keyword" name="query">
+        <button class="btn btn-outline-secondary"
+                {% if not searches_remaining %}
+                    disabled
+                {% else %}
+                    onclick="$('.search-spinner').show()"
+                {% endif %}
+                type="submit">
+            <span class="search-spinner spinner-border spinner-border-sm"
+                  style="display:none"></span>
+            Search
+        </button>
     </div>
 </form>
+
+{% if error %}
+<p style="color: red; text-align: center">{{ error }}</p>
+{% endif %}
 
 {% if report %}
 <hr>
