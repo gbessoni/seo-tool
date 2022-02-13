@@ -31,6 +31,11 @@ def serp_finder():
     serp_info = serpapi.get_account_info()
     query = request.args.get('query')
 
+    limit = 50
+    input_limit = request.args.get('limit')
+    if input_limit in ['50', '100']:
+        limit = int(input_limit)
+
     search_calls_remaining = serpapi.get_currently_remaining_searches(serp_info)
     # 11 - 10 mandatory + 1 backup
     searches_remaining = search_calls_remaining // 11
@@ -42,7 +47,7 @@ def serp_finder():
         )
 
     try:
-        serp_results = serpapi.search(query, 100)
+        serp_results = serpapi.search(query, limit)
     except serpapi.APILimitsReached as e:
         return render_template(
             'serp_finder.html',
