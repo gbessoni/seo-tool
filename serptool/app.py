@@ -90,9 +90,8 @@ def check_domain():
         result['creation_date'] = creation_date.date().isoformat()
 
         today = datetime.date.today()
-        year_age = today.year - creation_date.year
-        if today.month < creation_date.month and today.day < creation_date.day:
-            year_age -= 1
+        age_delta = today - creation_date.date()
+        year_age = age_delta.days // 365
 
         result['year_age'] = year_age
 
